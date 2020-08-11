@@ -1,0 +1,53 @@
+//
+// ObjectList - Exclusions
+//
+// Check various ways of specifying file(s) to exclude from an ObjectList.
+//
+//------------------------------------------------------------------------------
+
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+// Common settings
+.CompilerInputPath          = 'Tools/FBuild/FBuildTest/Data/TestObjectList/Exclusions/'
+.UnityOutputPath            = '$Out$/Test/ObjectList/Exclusions/'
+.CompilerOutputPath         = '$Out$/Test/ObjectList/Exclusions/'
+
+//
+// Exclude by file name
+//------------------------------------------------------------------------------
+ObjectList( 'ExcludeFileName' )
+{
+    .CompilerInputExcludedFiles = 'ignore.cpp'
+    .CompilerOutputPath         + 'ExcludeFileName/'
+}
+
+//
+// Exclude by file path
+//------------------------------------------------------------------------------
+ObjectList( 'ExcludeFilePath' )
+{
+    .CompilerInputExcludedFiles = 'Exclusions/ignore.cpp'
+    .CompilerOutputPath         + 'ExcludeFilePath/'
+}
+
+//
+// Exclude by file path (relative)
+//------------------------------------------------------------------------------
+ObjectList( 'ExcludeFilePathRelative' )
+{
+    .CompilerInputExcludedFiles = '../Code/Tools/FBuild/FBuildTest/Data/TestObjectList/Exclusions/ignore.cpp'
+    .CompilerOutputPath         + 'ExcludeFilePathRelative/'
+}
+
+//
+// Exclude by file pattern
+//------------------------------------------------------------------------------
+ObjectList( 'ExcludeFilePattern' )
+{
+    .CompilerInputExcludePattern    = "*nore.cpp"
+    .CompilerOutputPath             + 'ExcludeFilePattern/'
+}

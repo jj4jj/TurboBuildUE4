@@ -1,0 +1,77 @@
+// TestFramework
+//------------------------------------------------------------------------------
+{
+    .ProjectName        = 'TestFramework'
+    .ProjectPath        = 'TestFramework'
+
+    // Library
+    //--------------------------------------------------------------------------
+    .ProjectConfigs = {}
+    ForEach( .BuildConfig in .BuildConfigs )
+    {
+        Using( .BuildConfig )
+        .OutputBase + '\$Platform$-$BuildConfigName$'
+
+        // Unity
+        //--------------------------------------------------------------------------
+        Unity( '$ProjectName$-Unity-$Platform$-$BuildConfigName$' )
+        {
+            .UnityInputPath             = '$ProjectPath$/'
+            .UnityOutputPath            = '$OutputBase$/$ProjectPath$/'
+            .UnityOutputPattern         = '$ProjectName$_Unity*.cpp'
+        }
+
+        // Library
+        //--------------------------------------------------------------------------
+        ObjectList( '$ProjectName$-Lib-$Platform$-$BuildConfigName$' )
+        {
+            // Test framework uses exceptions
+            .CompilerOptions            + .UseExceptions
+
+            // Input (Unity)
+            .CompilerInputUnity         = '$ProjectName$-Unity-$Platform$-$BuildConfigName$'
+
+            // Output
+            .CompilerOutputPath         = '$OutputBase$/$ProjectPath$/'
+        }
+        Alias( '$ProjectName$-$Platform$-$BuildConfigName$' ) { .Targets = '$ProjectName$-Lib-$Platform$-$BuildConfigName$' }
+        ^'Targets_$Platform$_$BuildConfigName$' + { '$ProjectName$-$Platform$-$BuildConfigName$' }
+
+        #if __WINDOWS__
+            .ProjectConfig              = [ Using( .'Project_$Platform$_$BuildConfigName$' ) .Target = '$ProjectName$-$Platform$-$BuildConfigName$' ]
+            ^ProjectConfigs             + .ProjectConfig
+        #endif
+        #if __OSX__
+            .ProjectConfig              = [ .Config = '$BuildConfigName$'   .Target = '$ProjectName$-x64OSX-$BuildConfigName$' ]
+            ^ProjectConfigs             + .ProjectConfig
+        #endif
+    }
+
+    // Aliases
+    //--------------------------------------------------------------------------
+    CreateCommonAliases( .ProjectName )
+
+    // Visual Studio Project Generation
+    //--------------------------------------------------------------------------
+    #if __WINDOWS__
+        VCXProject( '$ProjectName$-proj' )
+        {
+            .ProjectOutput              = '../tmp/VisualStudio/Projects/$ProjectName$.vcxproj'
+            .ProjectInputPaths          = '$ProjectPath$\'
+            .ProjectBasePath            = '$ProjectPath$\'
+        }
+    #endif
+
+    // XCode Project Generation
+    //--------------------------------------------------------------------------
+    #if __OSX__
+        XCodeProject( '$ProjectName$-xcodeproj' )
+        {
+            .ProjectOutput              = '../tmp/XCode/Projects/1_Test/$ProjectName$.xcodeproj/project.pbxproj'
+            .ProjectInputPaths          = '$ProjectPath$/'
+            .ProjectBasePath            = '$ProjectPath$/'
+
+            .XCodeBuildWorkingDir       = '../../../../Code/'
+        }
+   #endif
+}

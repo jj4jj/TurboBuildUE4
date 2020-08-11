@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Costura.Fody.3.3.3\build\Costura.Fody.props" Condition="Exists('packages\Costura.Fody.3.3.3\build\Costura.Fody.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9E5AE0DF-0B8E-4412-9403-A25C3AEF16A4}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FastBuild.Dashboard</RootNamespace>
+    <AssemblyName>FBDashboard</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FastBuild.Dashboard.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Icons\app.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Caliburn.Micro, Version=3.0.3.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
+      <HintPath>packages\Caliburn.Micro.Core.3.1.0\lib\net45\Caliburn.Micro.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro.Platform, Version=3.0.3.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
+      <HintPath>packages\Caliburn.Micro.3.1.0\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro.Platform.Core, Version=3.0.3.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
+      <HintPath>packages\Caliburn.Micro.3.1.0\lib\net45\Caliburn.Micro.Platform.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Costura, Version=3.3.3.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>packages\Costura.Fody.3.3.3\lib\net40\Costura.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
+      <HintPath>packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Caliburn.Micro.3.1.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="-\Caliburn\Micro\Validation\DirectoryExistsAttribute.cs" />
+    <Compile Include="-\Caliburn\Micro\Validation\EmailAttribute.cs" />
+    <Compile Include="-\Caliburn\Micro\Validation\FileExistsAttribute.cs" />
+    <Compile Include="-\Caliburn\Micro\Validation\MultipleEmailAttribute.cs" />
+    <Compile Include="-\Caliburn\Micro\Validation\ValidatingScreen.cs" />
+    <Compile Include="-\Caliburn\Micro\Validation\ValidationGroupAttribute.cs" />
+    <Compile Include="AppArguments.cs" />
+    <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Communication\BuildJobStatus.cs" />
+    <Compile Include="Communication\Events\BuildEventArgs.cs" />
+    <Compile Include="Communication\BuildWatcher.cs" />
+    <Compile Include="Communication\Events\FinishJobEventArgs .cs" />
+    <Compile Include="Communication\Events\ParseException.cs" />
+    <Compile Include="Communication\Events\ReportCounterEventArgs.cs" />
+    <Compile Include="Communication\Events\ReportProgressEventArgs.cs" />
+    <Compile Include="Communication\Events\StartJobEventArgs.cs" />
+    <Compile Include="Communication\Events\StopBuildEventArgs.cs" />
+    <Compile Include="Communication\Events\StartBuildEventArgs.cs" />
+    <Compile Include="Communication\LogWatcher.cs" />
+    <Compile Include="Configuration\AppSettings.cs" />
+    <Compile Include="Configuration\Profile.cs" />
+    <Compile Include="Configuration\SettingsBase.cs" />
+    <Compile Include="Configuration\SettingsExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Properties\Debug.cs" />
+    <Compile Include="Services\Build\BuildJobDisplayMode.cs" />
+    <Compile Include="Services\Build\BuildViewportServiceXamlSupport.cs" />
+    <Compile Include="Services\Build\SourceEditor\CustomExternalSourceEditor.cs" />
+    <Compile Include="Services\Build\SourceEditor\DefaultExternalSourceEditor.cs" />
+    <Compile Include="Services\Build\SourceEditor\ExternalSourceEditorAttribute.cs" />
+    <Compile Include="Services\Build\SourceEditor\ExternalSourceEditorBase.cs" />
+    <Compile Include="Services\Build\SourceEditor\ExternalSourceEditorMetadata.cs" />
+    <Compile Include="Services\Build\SourceEditor\ExternalSourceEditorService.cs" />
+    <Compile Include="Services\Build\SourceEditor\IExternalSourceEditor.cs" />
+    <Compile Include="Services\Build\IBuildViewportService.cs" />
+    <Compile Include="Services\Build\SourceEditor\IExternalSourceEditorService.cs" />
+    <Compile Include="Services\Build\SourceEditor\NotepadPlusPlus.cs" />
+    <Compile Include="Services\Build\SourceEditor\VisualStudio.cs" />
+    <Compile Include="Services\Build\SourceEditor\VisualStudio.win32.cs">
+      <DependentUpon>VisualStudio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Services\Build\SourceEditor\VisualStudioCode.cs" />
+    <Compile Include="ShadowContext.cs" />
+    <Compile Include="Support\MathEx.cs" />
+    <Compile Include="Support\SingleInstance.cs" />
+    <Compile Include="Services\Worker\ExternalWorkerAgent.cs" />
+    <Compile Include="Services\Worker\ExternalWorkerAgent.interop.cs">
+      <DependentUpon>ExternalWorkerAgent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Services\Worker\ExternalWorkerAgent.win32.cs">
+      <DependentUpon>ExternalWorkerAgent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Services\Worker\IWorkerAgent.cs" />
+    <Compile Include="Services\Worker\IWorkerAgentService.cs" />
+    <Compile Include="Services\IBrokerageService.cs" />
+    <Compile Include="Services\Build\BuildViewportService.cs" />
+    <Compile Include="Services\Worker\WorkerAgentService.cs" />
+    <Compile Include="Services\Worker\WorkerCoreState.cs" />
+    <Compile Include="Services\Worker\WorkerCoreStatus.cs" />
+    <Compile Include="Services\Worker\WorkerMode.cs" />
+    <Compile Include="Services\BrokerageService.cs" />
+    <Compile Include="Services\Worker\WorkerRunStateChangedEventArgs.cs" />
+    <Compile Include="Support\BoolToVisibilityConverter.cs" />
+    <Compile Include="Support\DependencyObjectExtensions.cs" />
+    <Compile Include="Support\DragScrollViewer.cs" />
+    <Compile Include="Support\MouseWheelGesture.cs" />
+    <Compile Include="Support\SimpleCommand.cs" />
+    <Compile Include="ViewModels\About\AboutViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildErrorGroup.cs" />
+    <Compile Include="ViewModels\Build\BuildErrorInfo.cs" />
+    <Compile Include="ViewModels\Build\BuildInitiatorProcessViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildInitiatorProcessViewModel.win32.cs">
+      <DependentUpon>BuildInitiatorProcessViewModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Build\BuildSessionViewModel.Status.cs">
+      <DependentUpon>BuildSessionViewModel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Build\IBuildJobViewModel.cs" />
+    <Compile Include="ViewModels\Build\MergedBuildJobViewModel.cs" />
+    <Compile Include="ViewModels\IMainPage.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildSessionJobManager.cs" />
+    <Compile Include="ViewModels\Settings\SettingsValidator.cs" />
+    <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsViewModel.ExternalSourceEditor.cs">
+      <DependentUpon>SettingsViewModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Worker\WorkerCoreStatusViewModel.cs" />
+    <Compile Include="ViewModels\Worker\WorkerViewModel.cs" />
+    <Compile Include="Views\About\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildSessionStatusView.xaml.cs">
+      <DependentUpon>BuildSessionStatusView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobsView.JobManagement.cs">
+      <DependentUpon>BuildJobsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobsView.Layout.cs">
+      <DependentUpon>BuildJobsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobsView.Render.cs">
+      <DependentUpon>BuildJobsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobTooltipView.xaml.cs">
+      <DependentUpon>BuildJobTooltipView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobsView.Tooltip.cs">
+      <DependentUpon>BuildJobsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildSessionWorkersBackgroundView.xaml.cs">
+      <DependentUpon>BuildSessionWorkersBackgroundView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildJobsView.cs" />
+    <Compile Include="Views\Build\BuildWorkerStatusView.xaml.cs">
+      <DependentUpon>BuildWorkerStatusView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\TimeRulerView.cs" />
+    <Compile Include="Views\Build\BuildSessionWorkersHeaderView.xaml.cs">
+      <DependentUpon>BuildSessionWorkersHeaderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Settings\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TrayNotifier.cs" />
+    <Compile Include="Views\Worker\WorkerCoreStatusView.xaml.cs">
+      <DependentUpon>WorkerCoreStatusView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Worker\WorkerView.xaml.cs">
+      <DependentUpon>WorkerView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Themes\BuildJob.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Layout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\About\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildSessionStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildJobTooltipView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildSessionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildWatcherView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildSessionWorkersBackgroundView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Build\BuildWorkerStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModels\Build\BuildCoreViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildWorkerViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildSessionViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildJobViewModel.cs" />
+    <Compile Include="ViewModels\Build\BuildWatcherViewModel.cs" />
+    <Compile Include="Views\Build\BuildSessionView.xaml.cs">
+      <DependentUpon>BuildSessionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Build\BuildWatcherView.xaml.cs">
+      <DependentUpon>BuildWatcherView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainWindowView.xaml.cs">
+      <DependentUpon>MainWindowView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Views\Build\BuildSessionWorkersHeaderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Settings\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Worker\WorkerCoreStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Worker\WorkerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\tray_normal_16.ico" />
+    <Resource Include="Resources\Icons\tray_working_1_16.ico" />
+    <Resource Include="Resources\Icons\tray_working_2_16.ico" />
+    <Resource Include="Resources\Icons\tray_working_0_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\tray_disabled_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\tray_working_all_16.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Fody.6.1.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.6.1.2\build\Fody.targets'))" />
+    <Error Condition="!Exists('packages\Costura.Fody.3.3.3\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.3.3.3\build\Costura.Fody.props'))" />
+  </Target>
+  <Import Project="packages\Fody.6.1.2\build\Fody.targets" Condition="Exists('packages\Fody.6.1.2\build\Fody.targets')" />
+</Project>

@@ -1,0 +1,34 @@
+//
+// Object
+//
+#include "../../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+// Common settings
+.UnityOutputPath            = '$Out$/Test/Object/StaleDynamicDeps/'
+.CompilerOutputPath         = '$Out$/Test/Object/StaleDynamicDeps/'
+
+// CPPGenerator
+// - Create an exe which can generate a .cpp file from a .h file
+//------------------------------------------------------------------------------
+ObjectList( 'CPPGeneratorCompile' )
+{
+    #if __WINDOWS__
+        .CompilerOptions    + ' /MT'
+                            + '  -D"_CRT_SECURE_NO_WARNINGS"' // don't warn about fopen etc usage
+    #endif
+    .CompilerInputFiles     = 'Tools/FBuild/FBuildTest/Data/TestObject/StaleDynamicDeps/CPPGeneratorMain.cpp'
+    .CompilerOuputExtension = '.cpp'
+    .CompilerOutputPath     + 'CPPGenerator/'
+}
+Executable( 'CPPGenerator' )
+{
+    .Libraries              = 'CPPGeneratorCompile'
+    .LinkerOutput           = '$Out$/Test/Object/StaleDynamicDeps/CPPGenerator.exe'
+    #if __WINDOWS__
+        .LinkerOptions      + ' /SUBSYSTEM:CONSOLE'
+                            + ' kernel32.lib'
+                            + .CRTLibs_Static
+    #endif
+}

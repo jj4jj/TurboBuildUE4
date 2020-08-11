@@ -1,0 +1,123 @@
+// LZ4
+//------------------------------------------------------------------------------
+.LZ4BasePath        = '../External/LZ4/lz4-1.9.2/lib'
+.LZ4IncludePaths    = ' "-I$LZ4BasePath$"'
+{
+    .ProjectName        = 'LZ4'
+    .ProjectPath        = '$LZ4BasePath$'
+
+    // Target/Compiler specific options
+    .LZ4Options_x64     = [
+                            .LZ4CompilerOptions = ' /wd6239'    // (<non-zero constant> && <expression>) always evaluates to the result of <expression>.  Did you intend to use the bitwise-and operator?
+                                                + ' /wd6240'    // (<expression> && <non-zero constant>) always evaluates to the result of <expression>.  Did you intend to use the bitwise-and operator?
+                                                + ' /wd6262'    // Function uses '%u' bytes of stack:  exceeds /analyze:stacksize '16384'.  Consider moving some data to heap.
+                                                + ' /wd6326'    // Potential comparison of a constant with another constant.
+                                                + ' /wd6385'    // Reading invalid data from 'v':  the readable size is '_Old_5`2' bytes, but '4' bytes may be read.: Lines: 427, 430, 432, 436, 437, 438, 439
+                                                + ' /wd28251'   // warning C28251: Inconsistent annotation for '_setjmp': this instance has no annotations. See <no file>(0).
+
+                                                + ' -O2'        // Compile with optimizations even in debug to improve performance
+                          ]
+    .LZ4Options_x64Clang= [
+                            .LZ4CompilerOptions = ' -Wno-shift-count-overflow'
+                                                + ' -Wno-unused-macros'
+                                                + ' -Wno-unreachable-code'
+                                                + ' -Wno-sign-conversion'
+                                                + ' -Wno-covered-switch-default'
+                                                + ' -Wno-conversion'
+                                                + ' -Wno-missing-prototypes'
+
+                                                + ' -O2'        // Compile with optimizations even in debug to improve performance
+                          ]
+    .LZ4Options_x64Linux= [
+                            .LZ4CompilerOptions = ' -Wno-implicit-fallthrough'
+
+                                                + ' -O2'        // Compile with optimizations even in debug to improve performance
+                          ]
+    .LZ4Options_x64ClangLinux  = .LZ4Options_x64Linux
+    .LZ4Options_x64OSX  = [
+                            .LZ4CompilerOptions = ' -O2'        // Compile with optimizations even in debug to improve performance
+                          ]
+
+    // Library
+    //--------------------------------------------------------------------------
+    .ProjectConfigs = {}
+    ForEach( .BuildConfig in .BuildConfigs )
+    {
+        Using( .BuildConfig )
+
+        .OutputBase + '\$Platform$-$BuildConfigName$'
+
+        Using( ."LZ4Options_$Platform$" )
+
+        // Static Library
+        ObjectList( '$ProjectName$-Lib-$Platform$-$BuildConfigName$' )
+        {
+            // Input - Only build specific files we use
+            .CompilerInputFiles         = {
+                                            '$LZ4BasePath$\lz4.c'
+                                            '$LZ4BasePath$\lz4hc.c'
+                                            '$LZ4BasePath$\xxhash.c'
+                                          }
+
+            // Options
+            .CompilerOptions            = .CompilerOptionsC
+                                        + .LZ4IncludePaths
+                                        + .LZ4CompilerOptions
+
+                                        #if __WINDOWS__
+                                            // Remove flags that disable opimizations
+                                            - ' /Od'
+                                            - ' /RTC1'
+
+                                            // VS2015 gives false positives
+                                            #if USING_VS2015
+                                                - ' /analyze'
+                                            #endif
+                                        #else
+                                            - ' -O0'
+                                        #endif
+
+            // Output
+            .CompilerOutputPath         = '$OutputBase$/External/$ProjectName$/'
+        }
+        Alias( '$ProjectName$-$Platform$-$BuildConfigName$' ) { .Targets = '$ProjectName$-Lib-$Platform$-$BuildConfigName$' }
+
+        #if __WINDOWS__
+            .ProjectConfig              = [ Using( .'Project_$Platform$_$BuildConfigName$' ) .Target = '$ProjectName$-$Platform$-$BuildConfigName$' ]
+            ^ProjectConfigs             + .ProjectConfig
+        #endif
+        #if __OSX__
+            .ProjectConfig              = [ .Config = '$BuildConfigName$'   .Target = '$ProjectName$-x64OSX-$BuildConfigName$' ]
+            ^ProjectConfigs             + .ProjectConfig
+        #endif
+    }
+
+    // Aliases
+    //--------------------------------------------------------------------------
+    CreateCommonAliases( .ProjectName )
+
+    // Visual Studio Project Generation
+    //--------------------------------------------------------------------------
+    #if __WINDOWS__
+        VCXProject( '$ProjectName$-proj' )
+        {
+            .ProjectOutput              = '../tmp/VisualStudio/Projects/$ProjectName$.vcxproj'
+            .ProjectInputPaths          = '$ProjectPath$\'
+            .ProjectFiles               = '../External/LZ4/LZ4.bff'
+            .ProjectBasePath            = '$ProjectPath$\'
+        }
+    #endif
+
+    // XCode Project Generation
+    //--------------------------------------------------------------------------
+    #if __OSX__
+        XCodeProject( '$ProjectName$-xcodeproj' )
+        {
+            .ProjectOutput              = '../tmp/XCode/Projects/0_External/$ProjectName$.xcodeproj/project.pbxproj'
+            .ProjectInputPaths          = '$ProjectPath$/'
+            .ProjectBasePath            = '$ProjectPath$/'
+
+            .XCodeBuildWorkingDir       = '../../../../Code/'
+        }
+    #endif
+}

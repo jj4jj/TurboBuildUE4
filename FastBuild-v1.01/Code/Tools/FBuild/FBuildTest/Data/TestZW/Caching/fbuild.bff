@@ -1,0 +1,34 @@
+//
+// TestZW - Caching
+//
+// Ensure an object compiled with /ZW can be cached
+//
+//------------------------------------------------------------------------------
+
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+//
+// Caching
+//------------------------------------------------------------------------------
+ObjectList( 'Caching' )
+{
+    .CompilerOptions            + ' /ZW'
+                                + ' /EHsc'
+                                + ' /Zc:twoPhase-' // two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP
+                                + ' /AI"$VCPackagesPath$"'
+                                + ' /AI"$WindowsDK_WinRTAssemblyPath$"'
+
+                                #if USING_VS2019
+                                    // Avoid compiletime problems as of 16.5.1 (14.25.28610)
+                                    + ' /wd5204' // vccorlib.h(705,2): warning C5204: 'Platform::Details::ControlBlock': class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+                                #endif
+
+    .CompilerInputPath          = 'Tools/FBuild/FBuildTest/Data/TestZW/Caching/'
+    .CompilerOutputPath         = '$Out$/Test/ZW/Caching/'
+}
+
+//------------------------------------------------------------------------------

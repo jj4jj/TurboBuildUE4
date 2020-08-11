@@ -1,0 +1,30 @@
+//
+// Exe
+//
+// Build and link an executable.
+//
+//------------------------------------------------------------------------------
+
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+// A simple exe
+//--------------------
+ObjectList( "Exe-Lib" )
+{
+    .CompilerInputFiles = "Tools/FBuild/FBuildTest/Data/TestExe/exe.cpp"
+    .CompilerOutputPath = "$Out$/Test/Exe/"
+}
+
+Executable( "Exe" )
+{
+    #if __WINDOWS__
+        .LinkerOptions      + ' /SUBSYSTEM:CONSOLE'
+                            + ' /ENTRY:main'
+    #endif
+    .LinkerOutput       = '$Out$/Test/Exe/exe.exe'
+    .Libraries          = { "Exe-Lib" }
+}

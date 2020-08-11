@@ -1,0 +1,46 @@
+//
+// Build resources
+//
+
+#include "..\testcommon.bff"
+Using( .StandardEnvironment )
+Settings {} // Activate standard settings
+
+// Test output
+.CompilerOutputPath     = '../tmp/Test/Resources/'
+
+// Resources
+//------------------------------------------------------------------------------
+ObjectList( 'resources' )
+{
+    .Compiler               = 'ResourceCompiler'
+    .CompilerOptions        = '/nologo /fo%2'
+                            + .WindowsSDK_IncludePaths
+                            + ' %1' // Output must be last
+    .CompilerInputFiles     = "Tools/FBuild/FBuildTest/Data/TestResources/resource.rc"
+    .CompilerOutputExtension= '.res'
+}
+
+// Lib
+//------------------------------------------------------------------------------
+Library( 'exe-lib' )
+{
+    .CompilerInputFiles     = "Tools/FBuild/FBuildTest/Data/TestResources/main.cpp"
+    .LibrarianOutput        = '$Out$\Test\Resources\exe.lib'
+}
+
+// Exe
+//------------------------------------------------------------------------------
+Executable( 'exe' )
+{
+    // must link objects so the resources work properly
+    .LinkerLinkObjects  = true
+
+    .LinkerOptions      + " /SUBSYSTEM:WINDOWS"
+                        + .CRTLibs_Static
+                        + ' kernel32.lib'
+                        + ' User32.lib'
+    .LinkerOutput       = "$Out$\Test\Resources\exe.exe"
+    .Libraries          = { 'exe-lib',
+                            'resources' }
+}
