@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration xmlns="https://www.unrealengine.com/BuildConfiguration">
+    <BuildConfiguration>        
+        <FBuildBrokeragePath>\\192.168.1.1\samba\FASTBuildBrokerage</FBuildBrokeragePath>
+        <FBuildCachePath>\\192.168.1.1\samba\samba\FASTBuildCacheWith4.24</FBuildCachePath>
+        <bAllowFastBuild>true</bAllowFastBuild>
+        <bForceRemote>false</bForceRemote>
+        <bFastBuildDebug>false</bFastBuildDebug>
+    </BuildConfiguration>
+</Configuration>
