@@ -7,7 +7,7 @@
 * nothing
 
 ## Enable FASTBuild ##
-* copy the UE4.24 some directory to UE4.24 source code
+* copy the UE4.24 some  files (same file name , maybe you should use compare tools merge them) directory to UE4.24 source code
     * /Engine/Source/Programs/UnrealBuildTool
     * /Engine/Extras
     * /Engine/Source/Programs/Automation..Utils 
