@@ -5,6 +5,7 @@ accelerate build ue4 source code with cpp and shaders using FastBuild UE4.24 Tes
 ## Thoughts ##
 * https://gist.github.com/hillin/b6b491ee03f22b960a7e3e90e1c6f4ec
 * UE4.26 Extras/Experimental/FASTBuild/...
+* https://zhuanlan.zhihu.com/p/307581961
 
 ## Install Requirements ##
 * nothing
