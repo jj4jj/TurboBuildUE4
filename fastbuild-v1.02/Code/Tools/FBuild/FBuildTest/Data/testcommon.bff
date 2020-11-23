@@ -1,0 +1,77 @@
+//
+// Functionality commmon to multiple tests
+//
+#define BUILDING_FROM_TESTS // Control some behavior in shared bff files
+
+//==============================================================================
+// Visual Studio
+//==============================================================================
+#include "../../../../../External/SDK/GCC/GCC.bff"
+#include "../../../../../External/SDK/VisualStudio/VisualStudio.bff"
+#include "../../../../../External/SDK/Clang/Clang.bff"
+#include "../../../../../External/SDK/Windows/Windows.bff"
+
+#if __WINDOWS__
+    .VisualStudioToolChain_X64  = .ToolChain_VS_Windows_X64
+                                + .WindowsSDK_X64
+#endif
+
+//==============================================================================
+// Linux GCC
+//==============================================================================
+#if __LINUX__
+    .LinuxGCCToolChain =
+    [
+        Using( .ToolChain_GCC_Linux )
+
+        // TODO: Move this to ToolChain
+        .PCHOptions         = '-x c++-header'
+                            + .CompilerOptions
+                            + ' -std=c++11'                     // allow C++11 features
+                            + ' -Wno-invalid-offsetof'          // allow offset of members in non-POD types
+    ]
+#endif
+
+//==============================================================================
+// OSX Clang
+//==============================================================================
+#if __OSX__
+    .OSXClangToolChain =
+    [
+        Using( .ToolChain_Clang_OSX )
+
+        // TODO: Move this to ToolChain
+        .PCHOptions         = ' -x c++-header'
+                            + .CommonCompilerOptions
+                            + ' -std=c++11'
+    ]
+#endif
+
+//==============================================================================
+// Standard Environment
+//==============================================================================
+.StandardOutputBase         = '$_CURRENT_BFF_DIR_$/../../../../../tmp'
+.StandardEnvironment =
+[
+    #if __WINDOWS__
+        #import TMP
+        .Environment        = { 'PATH=$VS_PATH$',
+                                'TMP=$TMP$',
+                                'SystemRoot=C:\Windows' }
+        .CachePath          = '$TMP$\.fbuild.cache'
+        Using( .VisualStudioToolChain_X64 )
+    #endif
+    #if __LINUX__
+        .CachePath          = '/tmp/.fbuild.cache'
+        Using( .LinuxGCCToolChain )
+    #endif
+    #if __OSX__
+        .CachePath          = '/tmp/.fbuild.cache'
+        Using( .OSXClangToolChain )
+    #endif
+
+    // Default location for tmp files
+    .Out        = .StandardOutputBase
+]
+
+.TestRoot = 'Tools/FBuild/FBuildTest'

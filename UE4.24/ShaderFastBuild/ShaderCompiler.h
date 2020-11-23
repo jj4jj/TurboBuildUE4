@@ -319,6 +319,7 @@ public:
 	virtual int32 CompilingLoop() override;
 
 	static bool IsSupported();
+	static bool IsEnabled();
 };
 #endif
 

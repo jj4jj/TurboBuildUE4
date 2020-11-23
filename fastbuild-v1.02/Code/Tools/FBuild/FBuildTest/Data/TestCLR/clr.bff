@@ -1,0 +1,60 @@
+;
+; Test the compilation of Managed C (/clr) code
+;
+#include "..\testcommon.bff"
+Using( .StandardEnvironment )
+Settings {} // Activate standard settings
+
+Library( "CLR-Target" )
+{
+    .CompilerOptions    + ' /clr'
+                        + ' /Zc:twoPhase-' // two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP
+    .CompilerInputFiles = "Tools/FBuild/FBuildTest/Data/TestCLR/a.cpp"
+    .CompilerOutputPath = "$Out$/Test/CLR/"
+    .LibrarianOutput    = "$Out$/Test/CLR/clr.lib"
+}
+
+Library( "CLR-Parallel-Target" )
+{
+    .CompilerOptions    + ' /clr'
+                        + ' /Zc:twoPhase-' // two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP
+    .CompilerInputPath  = "Tools/FBuild/FBuildTest/Data/TestCLR/"
+    .CompilerOutputPath = "$Out$/Test/CLR/"
+    .LibrarianOutput    = "$Out$/Test/CLR/clrmulti.lib"
+}
+
+//
+// Test building an EXE containing a CLR lib
+//
+Library( 'BrigeTest-CLR' )
+{
+    .CompilerOptions    + ' /clr'
+                        + ' /Zc:twoPhase-' // two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP
+    .CompilerInputFiles = { 'Tools/FBuild/FBuildTest/Data/TestCLR/a.cpp',
+                            'Tools/FBuild/FBuildTest/Data/TestCLR/b.cpp' }
+    .CompilerOutputPath = '$Out$/Test/CLR/Bridge/'
+    .LibrarianOutput    = '$Out$/Test/CLR/Bridge/clr.lib'
+}
+ObjectList( 'BridgeTest-CPP' )
+{
+    .CompilerInputFiles = 'Tools/FBuild/FBuildTest/Data/TestCLR/exe.cxx'
+    .CompilerOutputPath = '$Out$/Test/CLR/Bridge/'
+    .LibrarianOutput    = '$Out$/Test/CLR/Bridge/exe.lib'
+}
+
+Executable( 'BridgeTest-Exe' )
+{
+    .LinkerOptions      + ' /SUBSYSTEM:CONSOLE'
+                        + ' /ENTRY:ExeMain'
+                        + ' kernel32.lib'
+                        + ' libvcruntime.lib'
+                        + ' libucrt.lib'
+                        + ' libcmt.lib'
+                        + ' msvcmrt.lib'
+                        + ' WindowsApp.lib'
+
+    .LinkerOutput       = '$Out$/Test/CLR/Bridge/Bridge.exe'
+    .Libraries          = { 'BridgeTest-CPP',
+                            'BrigeTest-CLR'
+                          }
+}

@@ -14,6 +14,11 @@
 
 
 #if PLATFORM_WINDOWS // FASTBuild shader compilation is only supported on Windows.
+
+//you can modify it by config
+static FString FASTBuild_CachePath(TEXT("\\\\192.168.1.1\\samba\\FastBuildCache\\ShaderCacheWith4.24"));
+static const FString FASTBuild_OrbisSDKToolchainRoot(TEXT("Engine\\Binaries\\ThirdParty\\PS4\\OrbisSDK"));
+
 namespace FASTBuildConsoleVariables {
 	/** The total number of batches to fill with shaders before creating another group of batches. */
 	bool bForceRemoteCompile = false;
@@ -45,7 +50,7 @@ namespace FASTBuildConsoleVariables {
 		ECVF_Default);
 
 	/** The maximum number of shaders to group into a single FASTBuild task. */
-	int32 BatchSize = 16;
+	int32 BatchSize = 128;
 	FAutoConsoleVariableRef CVarFASTBuildShaderCompileBatchSize(
 		TEXT("r.FASTBuildShaderCompile.BatchSize"),
 		BatchSize,
@@ -85,6 +90,15 @@ namespace FASTBuildConsoleVariables {
 							 FASTBuildConsoleVariables::bDisableCache,
 							 GEngineIni);
 
+			FString CachePath = GConfig->GetStr(TEXT("DevOptions.Shaders"),
+							 TEXT("FastBuildOptCachePath"),
+							 GEngineIni);
+
+			if(!CachePath.IsEmpty()){
+				FASTBuild_CachePath = CachePath;
+			}	
+
+			
 			// Allow command line to override the value of the console variables.
 			if (FParse::Param(FCommandLine::Get(), TEXT("xgeshadercompile"))) {
 				FASTBuildConsoleVariables::Enabled = true;
@@ -102,7 +116,7 @@ namespace FASTBuildConsoleVariables {
 static FString GetFASTBuild_ExecutablePath() {
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-	FString path1st = FPaths::ConvertRelativePathToFull(FPaths::EngineDir()) / TEXT("Extras/FASTBuild/FBuild.exe");
+	FString path1st = FPaths::ConvertRelativePathToFull(FPaths::EngineDir()) / TEXT("Extras/FASTBuild/Win64/FBuild.exe");
 	//auto AbsFBuildExecutablePath = FPaths::EngineDir() / GetFASTBuild_ExecutablePath();
 	if (!PlatformFile.FileExists(*path1st)) {
 		//todo search from path
@@ -111,37 +125,23 @@ static FString GetFASTBuild_ExecutablePath() {
 	return path1st;
 }
 
-static FString FASTBuild_CachePath(TEXT("..\\Saved\\FASTBuildCache"));
-static const FString FASTBuild_OrbisSDKToolchainRoot(TEXT("Engine\\Binaries\\ThirdParty\\PS4\\OrbisSDK"));
-static const FString FASTBuild_Toolchain[]
+
+//static const FString FASTBuild_ToolchainExtraFile[]{TEXT("Engine\\Binaries\\ThirdParty\\Windows\\DirectX\\x64\\d3dcompiler_47.dll"),};
+
+static const FString FASTBuild_ToolchainDir[]
 {
-	TEXT("Engine\\Binaries\\ThirdParty\\Windows\\DirectX\\x64\\d3dcompiler_47.dll"),
+	TEXT("Engine\\Binaries\\ThirdParty\\Windows\\DirectX\\x64"),
+	TEXT("Engine\\Binaries\\ThirdParty\\AppLocalDependencies\\Win64"),
 };
+
 
 static const FString FASTBuild_ScriptFileName(TEXT("fbshader.bff"));
 static const FString FASTBuild_InputFileName(TEXT("Worker.fbin"));
 static const FString FASTBuild_OutputFileName(TEXT("Worker.fbout"));
 static const FString FASTBuild_SuccessFileName(TEXT("Success"));
 
-bool FShaderCompileFASTBuildThreadRunnable::IsSupported() {
-
-	FASTBuildConsoleVariables::Init();
-
-	// Check to see if the FASTBuild exe exists.
-	if (FASTBuildConsoleVariables::Enabled) {
-		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-
-		//auto AbsFBuildExecutablePath = FPaths::EngineDir() / GetFASTBuild_ExecutablePath();
-		if (!PlatformFile.FileExists(*GetFASTBuild_ExecutablePath())) {
-			UE_LOG(LogShaderCompilers, Warning, TEXT("Cannot use FASTBuild Shader Compiler as FASTBuild is not found. Target Path:%s"), *GetFASTBuild_ExecutablePath());
-			FASTBuildConsoleVariables::Enabled = false;
-		}
-		else {
-			UE_LOG(LogShaderCompilers, Warning, TEXT("FASTBuild Shader Compiler found. Target Path:%s"), *GetFASTBuild_ExecutablePath());
-		}
-	}
-
-	return FASTBuildConsoleVariables::Enabled ;
+bool FShaderCompileFASTBuildThreadRunnable::IsEnabled(){
+	return FASTBuildConsoleVariables::Enabled;
 }
 
 
@@ -272,6 +272,82 @@ static void _DeleteFileHelper(const FString& Filename)
 		checkf(bDeletedOutput, TEXT("Failed to delete %s!"), *Filename);
 	}
 }
+
+
+
+static bool _GetCommonBaseDir(const FString & dir1, const FString &dir2, FString& basedir) {
+	FString d1 = FPaths::ConvertRelativePathToFull(dir1);
+	FString d2 = FPaths::ConvertRelativePathToFull(dir2);
+	basedir.Empty();
+
+	d1.ReplaceInline(TEXT("\\"), TEXT("/"), ESearchCase::CaseSensitive);
+	d2.ReplaceInline(TEXT("\\"), TEXT("/"), ESearchCase::CaseSensitive);
+	TArray<FString>  d1Array;
+	d1.ParseIntoArray(d1Array, TEXT("/"), true);
+
+	TArray<FString>  d2Array;
+	d2.ParseIntoArray(d2Array, TEXT("/"), true);
+
+	int idx = 0;
+	while (idx < d1Array.Num() && idx < d2Array.Num()) {
+		if (d1Array[idx].Compare(d2Array[idx], ESearchCase::IgnoreCase) == 0) {
+			++idx;
+		}
+		else {
+			break;
+		}
+	}
+
+	if (idx == 0) {
+		return false;
+	}
+
+
+	for (int i = 0; i < idx; ++i) {
+		basedir += d1Array[i];
+		if (i + 1 < idx) {
+			basedir += TEXT("/");
+		}
+	}
+	return true;
+}
+
+
+bool FShaderCompileFASTBuildThreadRunnable::IsSupported() {
+
+	FASTBuildConsoleVariables::Init();
+
+	// Check to see if the FASTBuild exe exists.
+	if (FASTBuildConsoleVariables::Enabled) {
+		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+		//auto AbsFBuildExecutablePath = FPaths::EngineDir() / GetFASTBuild_ExecutablePath();
+		if (!PlatformFile.FileExists(*GetFASTBuild_ExecutablePath())) {
+			UE_LOG(LogShaderCompilers, Warning, TEXT("Cannot use FASTBuild Shader Compiler as FASTBuild is not found. Target Path:%s"), *GetFASTBuild_ExecutablePath());
+			FASTBuildConsoleVariables::Enabled = false;
+		}
+		else {
+			UE_LOG(LogShaderCompilers, Warning, TEXT("FASTBuild Shader Compiler found. Target Path:%s"), *GetFASTBuild_ExecutablePath());
+		}
+
+		//need check same base for shader
+		FString basedir = FPaths::RootDir();
+		const auto DirMapping = AllShaderSourceDirectoryMappings();
+		for (const auto & me : DirMapping) {
+			if (!_GetCommonBaseDir(me.Value, basedir, basedir)) {
+				UE_LOG(LogShaderCompilers, Warning, TEXT("FASTBuild Shader Compiler Not Enabled for shader mapping not in same dir(%s,%s)"),
+					   *me.Value, *basedir);
+				FASTBuildConsoleVariables::Enabled = false;
+			}
+		}
+
+	}
+
+
+	return FASTBuildConsoleVariables::Enabled;
+}
+
+
 void FShaderCompileFASTBuildThreadRunnable::PostCompletedJobsForBatch(FShaderBatch* Batch) {
 	// Enter the critical section so we can access the input and output queues
 	FScopeLock Lock(&Manager->CompileQueueSection);
@@ -325,8 +401,6 @@ void FShaderCompileFASTBuildThreadRunnable::FShaderBatch::CleanUpFiles(bool keep
 	_DeleteFileHelper(SuccessFileNameAndPath);
 }
 
-
-
 static void WriteFASTBuildScriptFileHeader(FArchive* ScriptFile, const FString& WorkerName) {
 	static const TCHAR HeaderTemplate[] =
 		TEXT("Settings\r\n")
@@ -344,27 +418,48 @@ static void WriteFASTBuildScriptFileHeader(FArchive* ScriptFile, const FString& 
 		TEXT("\t.ExtraFiles = \r\n")
 		TEXT("\t{\r\n");
 
+	FString BaseRootDir = FPaths::RootDir();
+
 	FString HeaderString = FString::Printf(HeaderTemplate, 
-			*FASTBuild_CachePath, *WorkerName, *IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*FPaths::RootDir()), *FASTBuild_OrbisSDKToolchainRoot);
-	ScriptFile->Serialize((void*)StringCast<ANSICHAR>(*HeaderString, HeaderString.Len()).Get(), sizeof(ANSICHAR) * HeaderString.Len());
+			*FASTBuild_CachePath, *WorkerName, 
+			*IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*BaseRootDir), 
+			*FASTBuild_OrbisSDKToolchainRoot);
 
-	for (const FString& ExtraFilePartialPath : FASTBuild_Toolchain) {
-		FString ExtraFile = TEXT("\t\t'") + IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*(FPaths::RootDir() / ExtraFilePartialPath)) + TEXT("',\r\n");
-		ScriptFile->Serialize((void*)StringCast<ANSICHAR>(*ExtraFile, ExtraFile.Len()).Get(), sizeof(ANSICHAR) * ExtraFile.Len());
-	}
-
+	ScriptFile->Serialize((void*)StringCast<ANSICHAR>(*HeaderString, HeaderString.Len()).Get(), 
+											sizeof(ANSICHAR) * HeaderString.Len());
 	class FDependencyEnumerator : public IPlatformFile::FDirectoryVisitor {
 	public:
-		FDependencyEnumerator(FArchive* InScriptFile, const TCHAR* InPrefix, const TCHAR* InExtension)
+		FDependencyEnumerator(FArchive* InScriptFile, const TCHAR* InPrefix, const TCHAR* InExtension,const TCHAR* InExcludeExtensions=NULL)
 			: ScriptFile(InScriptFile)
 			, Prefix(InPrefix)
-			, Extension(InExtension) {}
+			, Extension(InExtension) 
+		{		
+			if(InExcludeExtensions != NULL){
+			
+				FString Extersion = InExcludeExtensions;
+				while(true){				
+					FString  CurExt = TEXT("");
+					FString LeftExts = TEXT("");
+					if(Extersion.Split("|", &CurExt, &LeftExts)){
+						ExcludeExtersions.Add(CurExt);
+						Extersion = LeftExts;
+					}
+					else {
+						ExcludeExtersions.Add(Extersion);
+						break;
+					}
+				}
+			}			
+		}
 
 		virtual bool Visit(const TCHAR* FilenameChar, bool bIsDirectory) override {
 			if (!bIsDirectory) {
 				FString Filename = FString(FilenameChar);
 
-				if ((!Prefix || Filename.Contains(Prefix)) && (!Extension || Filename.EndsWith(Extension))) {
+				FString FileExtension = FPaths::GetExtension(Filename);
+				bool Excluded = ExcludeExtersions.Find(FileExtension) != INDEX_NONE;
+
+				if (!Excluded && (!Prefix || Filename.Contains(Prefix)) && (!Extension || Filename.EndsWith(Extension))) {
 					FString ExtraFile = TEXT("\t\t'") + IFileManager::Get().ConvertToAbsolutePathForExternalAppForWrite(*Filename) + TEXT("',\r\n");
 					ScriptFile->Serialize((void*)StringCast<ANSICHAR>(*ExtraFile, ExtraFile.Len()).Get(), sizeof(ANSICHAR) * ExtraFile.Len());
 				}
@@ -376,25 +471,30 @@ static void WriteFASTBuildScriptFileHeader(FArchive* ScriptFile, const FString& 
 		FArchive* const ScriptFile;
 		const TCHAR* Prefix;
 		const TCHAR* Extension;
+		TArray<FString> ExcludeExtersions;
 	};
 
-	FDependencyEnumerator DllDeps = FDependencyEnumerator(ScriptFile, TEXT("ShaderCompileWorker-"), TEXT(".dll"));
-	IFileManager::Get().IterateDirectoryRecursively(*FPlatformProcess::GetModulesDirectory(), DllDeps);
 
-	FDependencyEnumerator ManifestDeps = FDependencyEnumerator(ScriptFile, TEXT("ShaderCompileWorker"), TEXT(".modules"));
-	IFileManager::Get().IterateDirectoryRecursively(*FPlatformProcess::GetModulesDirectory(), ManifestDeps);
+	//deps
+	//tool chain file
+	//for (const FString& ExtraFilePartialPath : FASTBuild_ToolchainExtraFile) {
+	//	FString ExtraFile = TEXT("\t\t'") + IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*(FPaths::RootDir() / ExtraFilePartialPath)) + TEXT("',\r\n");
+	//	ScriptFile->Serialize((void*)StringCast<ANSICHAR>(*ExtraFile, ExtraFile.Len()).Get(), sizeof(ANSICHAR) * ExtraFile.Len());
+	//}
 
-	FDependencyEnumerator ShaderUshDeps = FDependencyEnumerator(ScriptFile, nullptr, TEXT(".ush"));
-	IFileManager::Get().IterateDirectoryRecursively(FPlatformProcess::ShaderDir(), ShaderUshDeps);
+	//tool chain path
+	FDependencyEnumerator AllFileVisitor = FDependencyEnumerator(ScriptFile, NULL, NULL);
+	for (const FString& toolPath : FASTBuild_ToolchainDir) {
+		IFileManager::Get().IterateDirectoryRecursively(*FPaths::Combine(BaseRootDir, toolPath), AllFileVisitor);
+	}
 
-	FDependencyEnumerator ShaderUsfDeps = FDependencyEnumerator(ScriptFile, nullptr, TEXT(".usf"));
-	IFileManager::Get().IterateDirectoryRecursively(FPlatformProcess::ShaderDir(), ShaderUsfDeps);
+	FDependencyEnumerator ModuleDeps = FDependencyEnumerator(ScriptFile, TEXT("ShaderCompileWorker"), nullptr, TEXT("pdb|exe"));
+	IFileManager::Get().IterateDirectoryRecursively(*FPlatformProcess::GetModulesDirectory(), ModuleDeps);
 
-	FDependencyEnumerator PluginShaderUshDeps = FDependencyEnumerator(ScriptFile, nullptr, TEXT(".ush"));
-	IFileManager::Get().IterateDirectoryRecursively(*FPaths::Combine(*(FPaths::EngineDir()), TEXT("Plugins")), PluginShaderUshDeps);
-
-	FDependencyEnumerator PluginShaderUsfDeps = FDependencyEnumerator(ScriptFile, nullptr, TEXT(".usf"));
-	IFileManager::Get().IterateDirectoryRecursively(*FPaths::Combine(*(FPaths::EngineDir()), TEXT("Plugins")), PluginShaderUsfDeps);
+	const auto DirMapping = AllShaderSourceDirectoryMappings();
+	for(const auto & me: DirMapping){		
+		IFileManager::Get().IterateDirectoryRecursively(*me.Value, AllFileVisitor);
+	}
 
 	const FString ExtraFilesFooter =
 		TEXT("\t}\r\n")
@@ -590,7 +690,20 @@ int32 FShaderCompileFASTBuildThreadRunnable::CompilingLoop() {
 			ShaderBatchesIncomplete.Empty(FASTBuildConsoleVariables::BatchGroupSize);
 
 			FString ScriptFilename = FASTBuildWorkingDirectory / FString::FromInt(FASTBuildDirectoryIndex) / FASTBuild_ScriptFileName;
-			UE_LOG(LogShaderCompilers, Log, TEXT("Generate FastBuildShaderScript Path:%s"), *ScriptFilename);
+
+			//
+			static int FbBuildSeq = 0;
+			UE_LOG(LogShaderCompilers, Log, TEXT("Generate FastBuildShaderScript Path:%s ProjectDir:%s FilePath:%s IsProjectFilePathSet:%d CacheEnable:%d CachePath:%s"),
+				*ScriptFilename, *FPaths::ProjectDir(), *FPaths::GetProjectFilePath(), FPaths::IsProjectFilePathSet(),
+				   FASTBuildConsoleVariables::bDisableCache == false, *FASTBuild_CachePath);
+			for(;;++FbBuildSeq){
+				auto TryFileName = ScriptFilename.Replace(TEXT(".bff"), *FString::Printf(TEXT(".%04d.bff"), FbBuildSeq));
+				if (!FPaths::FileExists(TryFileName)){
+					ScriptFilename = TryFileName;
+					break;
+				}
+			}
+
 			// Create the FASTBuild script file.
 			FArchive* ScriptFile = _CreateFileHelper(ScriptFilename);
 			WriteFASTBuildScriptFileHeader(ScriptFile, Manager->ShaderCompileWorkerName);
@@ -606,7 +719,7 @@ int32 FShaderCompileFASTBuildThreadRunnable::CompilingLoop() {
 					TEXT("ObjectList('ShaderBatch-%d')\r\n")
 					TEXT("{\r\n")
 					TEXT("\t.Compiler = 'ShaderCompiler'\r\n")
-					TEXT("\t.CompilerOptions = '\"\" %d %d \"%%1\" \"%%2\" '\r\n")
+					TEXT("\t.CompilerOptions = '\"\" %d %d \"%%1\" \"%%2\" -xge_xml %s '\r\n")
 					TEXT("\t.CompilerOutputExtension = '.fbout'\r\n")
 					TEXT("\t.CompilerInputFiles = { '%s' }\r\n")
 					TEXT("\t.CompilerOutputPath = '%s'\r\n")
@@ -614,6 +727,7 @@ int32 FShaderCompileFASTBuildThreadRunnable::CompilingLoop() {
 					Batch->BatchIndex,
 					Manager->ProcessId,
 					Batch->BatchIndex,
+					*FCommandLine::GetSubprocessCommandline(),
 					*Batch->InputFileNameAndPath,
 					*WorkerAbsoluteDirectory);
 
@@ -655,7 +769,7 @@ int32 FShaderCompileFASTBuildThreadRunnable::CompilingLoop() {
 			// Regular shader compilation errors are not returned as worker errors.
 			//-forceremote
 			//FString FBConsoleArgs = TEXT("-config \"") + ScriptFilename + TEXT("\" -dist -monitor -cache");
-			FString FBConsoleArgs = TEXT("-config \"") + ScriptFilename + TEXT("\" -monitor ");
+			FString FBConsoleArgs = TEXT("-config \"") + ScriptFilename + TEXT("\" -monitor -summary");
 			if(!FASTBuildConsoleVariables::bDisableRemoteCompile){
 				FBConsoleArgs += TEXT(" -dist ");
 				if (FASTBuildConsoleVariables::bForceRemoteCompile) {

@@ -1,0 +1,61 @@
+;
+; Test the compilation of C# code
+;
+
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+Compiler( 'CSharpCompiler' )
+{
+    .Executable     = "C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"
+}
+
+.Compiler           = 'CSharpCompiler'
+.CompilerOptions    = '/out:"%2" /target:library "%1"'
+.CompilerInputPathRecurse = false
+
+;
+; A single c# file
+;
+CSAssembly( "CSharp-Single-Target" )
+{
+    .CompilerInputFiles = "Tools/FBuild/FBuildTest/Data/TestCSharp/a.cs"
+    .CompilerOutput     = "$Out$/Test/CSharp/csharpsingle.dll"
+}
+
+;
+; Multiple c# files
+;
+CSAssembly( "CSharp-Multi-Target" )
+{
+    .CompilerInputPath      = "Tools/FBuild/FBuildTest/Data/TestCSharp/"
+    .CompilerOutput         = "$Out$/Test/CSharp/csharpmulti.dll"
+}
+
+;
+; Multiple c# assemblies
+;
+CSAssembly( "CSharp-AssemblyA" )
+{
+    .CompilerInputFiles     = "Tools/FBuild/FBuildTest/Data/TestCSharp/a.cs"
+    .CompilerOutput         = "$Out$/Test/CSharp/csharpassemblya.dll"
+}
+
+CSAssembly( "CSharp-AssemblyB" )
+{
+    .CompilerInputFiles     = "Tools/FBuild/FBuildTest/Data/TestCSharp/b.cs"
+    .CompilerOutput         = "$Out$/Test/CSharp/csharpassemblyb.dll"
+    .CompilerOptions        = '/reference:"%3" $CompilerOptions$'
+    .CompilerReferences     = "CSharp-AssemblyA"
+}
+
+CSAssembly( "CSharp-AssemblyC" )
+{
+    .CompilerInputFiles     = "Tools/FBuild/FBuildTest/Data/TestCSharp/c.cs"
+    .CompilerOutput         = "$Out$/Test/CSharp/csharpassemblyc.dll"
+    .CompilerOptions        = '/reference:"%3" $CompilerOptions$'
+    .CompilerReferences     = { "CSharp-AssemblyA", "CSharp-AssemblyB" }
+}

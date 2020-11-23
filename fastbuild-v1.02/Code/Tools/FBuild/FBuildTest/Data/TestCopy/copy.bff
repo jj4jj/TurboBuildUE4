@@ -1,0 +1,98 @@
+//
+// Test the Copy Function/Node
+//
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+//
+// Copying a single file
+//
+Copy( "TestCopyFileToFile" )
+{
+    .Source = "$TestRoot$/Data/TestCopy/copy.bff"
+    .Dest   = "$Out$/Test/Copy/copy.bff.copy"
+}
+
+//
+// Copy to a directory
+//
+Copy( "TestCopyFileToDir" )
+{
+    .Source = "$TestRoot$/Data/TestCopy/copy.bff"
+    .Dest   = "$Out$/Test/Copy/"
+}
+
+//
+// Copy multiple files to directory
+//
+Copy( "TestMultiCopyToDir" )
+{
+    .Source = { "$TestRoot$/Data/TestCopy/a.txt",
+                "$TestRoot$/Data/TestCopy/b.txt" }
+    .Dest = "$Out$/Test/Copy/"
+}
+
+//
+// Copy with SourceBasePath
+//
+Copy( "TestSourceBasePath" )
+{
+    .Source = { "$TestRoot$/Data/TestCopy/a.txt",
+                "$TestRoot$/Data/TestCopy/b.txt" }
+    .SourceBasePath = "$TestRoot$/Data/" // This means we should re-create the hierarchy after this (i.e. the TestCopy dir)
+    .Dest = "$Out$/Test/Copy/SourceBasePath/"
+}
+
+//
+// Chained copies
+//
+Copy( 'ChainedCopy1' )
+{
+    .Source = '$TestRoot$/Data/TestCopy/copy.bff'
+    .Dest   = '$Out$/Test/Copy/ChainedCopy/copy.copy1'
+}
+Copy( 'ChainedCopy2' )
+{
+    .Source = '$Out$/Test/Copy/ChainedCopy/copy.copy1' // by filename
+    .Dest   = '$Out$/Test/Copy/ChainedCopy/copy.copy2'
+}
+Copy( 'ChainedCopy3' )
+{
+    .Source = 'ChainedCopy2' // via Alias
+    .Dest   = '$Out$/Test/Copy/ChainedCopy/copy.copy3'
+}
+
+//
+// CopyDir
+//
+CopyDir( 'CopyDir' )
+{
+    .SourcePaths        = '$TestRoot$/Data/TestCopy'
+    .SourcePathsPattern = '*.txt'
+    .SourcePathsRecurse = false
+    .Dest               = '$Out$/Test/Copy/CopyDir/'
+}
+
+//
+// CopyDirDeleteSrc
+//
+CopyDir( 'CopyDirDeleteSrc' )
+{
+    .SourcePaths        = '$Out$/Test/Copy/CopyDirDeleteSrc/Src/'
+    .SourcePathsPattern = '*.txt'
+    .Dest               = '$Out$/Test/Copy/CopyDirDeleteSrc/Dst/'
+}
+
+//
+// CopyEmpty
+//
+Copy( 'CopyEmpty' )
+{
+    // It is useful to have empty source copies when multiple
+    // configs are used (e.g. dll vs non-dll configs)
+    .Source             = {}
+    .Dest               = '$Out$/Test/Copy/CopyEmpty/'
+}

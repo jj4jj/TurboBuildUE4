@@ -430,9 +430,12 @@ bool FShaderCompileUtilities::DoWriteTasks(const TArray<FShaderCommonCompileJob*
 	// Convert all the source directory paths to absolute, since SCW might be in a different directory to the editor executable
 	TMap<FString, FString> ShaderSourceDirectoryMappings = AllShaderSourceDirectoryMappings();
 	for (TPair<FString, FString>& Pair : ShaderSourceDirectoryMappings) {
-		//Pair.Value = FPaths::ConvertRelativePathToFull(Pair.Value);
+#if PLATFORM_WINDOWS
 		// Format everything on one line, and with the correct verbosity, so we can display proper errors in the failure logs.
-		UE_LOG(LogShaderCompilers, Log, TEXT("set shader map:%s->%s "), *Pair.Key, *Pair.Value);
+		Pair.Value = FPaths::ConvertRelativePathToFull(Pair.Value);
+#else
+		Pair.Value = FPaths::ConvertRelativePathToFull(Pair.Value);
+#endif
 	}
 
 	TransferFile << ShaderSourceDirectoryMappings;

@@ -1,0 +1,53 @@
+// Windows 10 SDK
+//------------------------------------------------------------------------------
+
+// Root Paths
+//------------------------------------------------------------------------------
+.Windows10_SDKBasePath          = 'D:\Windows Kits/10'
+.Windows10_SDKVersion           = '10.0.18362.0'
+#if CI_BUILD
+    .Windows10_SDKBasePath      = 'C:\Program Files (x86)\Windows Kits/10'
+    .Windows10_SDKVersion       = '10.0.17134.0'
+#endif
+
+// Defines
+//------------------------------------------------------------------------------
+.WindowsSDK_Defines             = ' -DWIN32_LEAN_AND_MEAN'
+                                + ' -DWIN32'
+                                + ' -D_WIN32'
+                                + ' -D__WINDOWS__'
+
+// Windows 10 SDK
+//------------------------------------------------------------------------------
+.Windows10_SDK_X64 =
+[
+    .WindowsSDK_IncludePaths        = ' "-I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/ucrt"'
+                                    + ' "-I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/um"'
+                                    + ' "-I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/shared"'
+
+    .WindowsDK_WinRTAssemblyPath    = '$Windows10_SDKBasePath$/UnionMetadata/$Windows10_SDKVersion$/'
+
+    .CommonCompilerOptions          = .WindowsSDK_IncludePaths
+                                    + .WindowsSDK_Defines
+                                    + ' -DWIN64'
+
+    .CompilerOptions                = .CommonCompilerOptions
+    .CompilerOptionsC               = .CommonCompilerOptions
+    .CompilerOptionsDeoptimized     = .CommonCompilerOptions
+    .PCHOptions                     = .CommonCompilerOptions
+
+    .LinkerOptions                  = ' /LIBPATH:"$Windows10_SDKBasePath$/Lib/$Windows10_SDKVersion$/um/x64"'
+                                    + ' /LIBPATH:"$Windows10_SDKBasePath$/Lib/$Windows10_SDKVersion$/ucrt/x64"'
+                                    + ' /MACHINE:X64'
+]
+Compiler( 'ResourceCompiler-Windows10' )
+{
+    .Executable                 = '$Windows10_SDKBasePath$/Bin/$Windows10_SDKVersion$/x64/RC.exe'
+    .CompilerFamily             = 'custom'
+}
+
+// PATH environment variable
+//------------------------------------------------------------------------------
+.WINDOWS_SDK_2019_PATH          = '$Windows10_SDKBasePath$/bin/$Windows10_SDKVersion$/x64'
+
+//------------------------------------------------------------------------------

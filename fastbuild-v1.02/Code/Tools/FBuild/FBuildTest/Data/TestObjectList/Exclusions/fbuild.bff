@@ -1,0 +1,90 @@
+//
+// ObjectList - Exclusions
+//
+// Check various ways of specifying file(s) to exclude from an ObjectList.
+//
+//------------------------------------------------------------------------------
+
+// Use the standard test environment
+//------------------------------------------------------------------------------
+#include "../../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+{
+    // Common settings
+    .CompilerInputPath          = 'Tools/FBuild/FBuildTest/Data/TestObjectList/Exclusions/'
+    .UnityOutputPath            = '$Out$/Test/ObjectList/Exclusions/'
+    .CompilerOutputPath         = '$Out$/Test/ObjectList/Exclusions/'
+
+    // ExcludedFiles - file name
+    ObjectList( 'ExcludedFiles-FileName' )
+    {
+        .CompilerInputExcludedFiles = 'ignore.cpp'
+        .CompilerOutputPath         + 'ExcludedFiles-FileName/'
+    }
+
+    // ExcludedFiles - file name with path (forward slash)
+    ObjectList( 'ExcludedFiles-FileNameWithPath-ForwardSlash' )
+    {
+        .CompilerInputExcludedFiles = 'Exclusions/ignore.cpp' // <- Forward slashes
+        .CompilerOutputPath         + 'ExcludedFiles-FileNameWithPath-ForwardSlash/'
+    }
+
+    // ExcludedFiles - file name with path (backslash)
+    ObjectList( 'ExcludedFiles-FileNameWithPath-Backslash' )
+    {
+        .CompilerInputExcludedFiles = 'Exclusions\ignore.cpp' // <- Backslashes
+        .CompilerOutputPath         + 'ExcludedFiles-FileNameWithPath-Backslash/'
+    }
+
+
+    // ExcludedFiles - file name with relative path (forward slash)
+    ObjectList( 'ExcludedFiles-FileNameWithRelativePath-ForwardSlash' )
+    {
+        .CompilerInputExcludedFiles = '../Code/Tools/FBuild/FBuildTest/Data/TestObjectList/Exclusions/ignore.cpp' // <- Forward slashes
+        .CompilerOutputPath         + 'ExcludedFiles-FileNameWithRelativePath-ForwardSlash/'
+    }
+
+    // ExcludedFiles - file name with relative path (backslash)
+    ObjectList( 'ExcludedFiles-FileNameWithRelativePath-Backslash' )
+    {
+        .CompilerInputExcludedFiles = '..\Code\Tools\FBuild\FBuildTest\Data\TestObjectList\Exclusions\ignore.cpp' // <- Backslashes
+        .CompilerOutputPath         + 'ExcludedFiles-FileNameWithRelativePath-Backslash/'
+    }
+
+    // ExcludePattern
+    ObjectList( 'ExcludePattern' )
+    {
+        .CompilerInputExcludePattern    = "*nore.cpp"
+        .CompilerOutputPath             + 'ExcludePattern/'
+    }
+
+    // ExcludePattern - with path (forward slash)
+    ObjectList( 'ExcludePattern-ForwardSlash' )
+    {
+        .CompilerInputExcludePattern    = "*/Exclusions/*nore.cpp" // <- Forward slashes
+        .CompilerOutputPath             + 'ExcludePattern-ForwardSlash'
+    }
+
+    // ExcludePattern - with path (backslash)
+    ObjectList( 'ExcludePattern-Backslash' )
+    {
+        .CompilerInputExcludePattern    = "*\Exclusions\*nore.cpp" // <- Backslashes
+        .CompilerOutputPath             + 'ExcludePattern-Backslash'
+    }
+}
+
+Alias( 'Test' )
+{
+    .Targets    = {
+                    'ExcludedFiles-FileName'
+                    'ExcludedFiles-FileNameWithPath-ForwardSlash'
+                    'ExcludedFiles-FileNameWithPath-Backslash'
+                    'ExcludedFiles-FileNameWithRelativePath-ForwardSlash'
+                    'ExcludedFiles-FileNameWithRelativePath-Backslash'
+                    'ExcludePattern'
+                    'ExcludePattern-ForwardSlash'
+                    'ExcludePattern-Backslash'
+                  }
+}

@@ -1,0 +1,48 @@
+//
+// Object
+//
+#include "../../testcommon.bff"
+Using( .StandardEnvironment )
+Settings {}
+
+// Common settings
+.UnityOutputPath            = '$Out$/Test/Object/StaleDynamicDeps/'
+.CompilerOutputPath         = '$Out$/Test/Object/StaleDynamicDeps/'
+
+// CPPGenerator (previously compiled)
+//------------------------------------------------------------------------------
+Compiler( 'CPPGenerator' )
+{
+    .Executable = '$Out$/Test/Object/StaleDynamicDeps/CPPGenerator.exe'
+    .CompilerFamily = 'custom'
+}
+
+//
+// Generate several .cpp files
+//------------------------------------------------------------------------------
+ObjectList( 'GenerateCPPFiles' )
+{
+    .Compiler                   = 'CPPGenerator'
+    .CompilerOptions            = '"%1" "%2"'
+    .CompilerInputPath          = '$Out$/Test/Object/StaleDynamicDeps/GeneratedInput' // Test will create files in here
+    .CompilerInputPattern       = '*.h'
+    .CompilerOutputExtension    = '.cpp'
+    .CompilerOutputPath         + 'Generated/'
+}
+
+Unity( 'Unity' )
+{
+    .UnityInputObjectLists      = 'GenerateCPPFiles'
+    .UnityOutputPath            + 'Unity/'
+}
+
+ObjectList( 'CompileGeneratedFiles' )
+{
+    .CompilerInputUnity         = 'Unity'
+    .CompilerOptions            + ' -I"."'
+}
+
+Alias( 'StaleDynamicDeps' )
+{
+    .Targets                    = 'CompileGeneratedFiles'
+}

@@ -1,0 +1,25 @@
+
+#include "../testcommon.bff"
+
+.ExternalPath = '..\External'
+
+Settings
+{
+    #import TMP
+    .Environment    = { "PATH=$VS_PATH$",
+                        "TMP=$TMP$",
+                        "SystemRoot=C:\Windows" }
+    .CachePath = 'c:\.fbuild.cache'
+}
+
+.Compiler   = '$ExternalPath$\SDK\CUDA_6.5.14\CUDAToolkit\bin\nvcc.exe'
+
+.Out        = "..\tmp"
+.CompilerOutputPath = "$Out$\Test\CUDA\"
+
+ObjectList( "Cuda-Obj" )
+{
+    .CompilerInputFiles = "Tools/FBuild/FBuildTest/Data/TestCUDA/test.cu"
+    .CompilerOutputPath = "$Out$\Test\CUDA\"
+    .CompilerOptions    = "%1 -o %2 -c"
+}
