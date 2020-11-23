@@ -16,6 +16,9 @@ accelerate build ue4 source code with cpp and shaders using FastBuild UE4.24 Tes
     * /Engine/Source/Programs/Automation..Utils 
     * /Engine/Source/Runtime/Engine/Public|Private
 * copy the configuration.xml to  <your documents>/Unreal Engine/UnrealBuildTool/ (you can modify it for changing some options)
+* Set System Environment variable , FASTBUILD_BROKERAGE_PATH  with YOUR OWN SAMBA PATH
+* Start FBuildWorker.exe  on worker machines  (also need CONFIG FASTBUILD_BROKERAGE_PATH)
+* Start UE4 project compiling it !
 
 ## Reference ##
 * https://www.fastbuild.org/docs/download.html
