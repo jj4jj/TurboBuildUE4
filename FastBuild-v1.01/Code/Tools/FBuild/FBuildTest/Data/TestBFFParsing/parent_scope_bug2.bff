@@ -1,8 +1,0 @@
-//
-// Parent Scope Bug
-//
-
-.A =
-{
-    ^A
-}

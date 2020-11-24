@@ -1,7 +1,0 @@
-//
-// Bad Define
-//
-#define THING
-
-// Invalid - already defined
-#define THING

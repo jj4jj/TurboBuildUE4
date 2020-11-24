@@ -1,7 +1,0 @@
-//
-// Make sure the error correctly reports unsupported operator
-//
-.Bool = true
-If(.Bool >= .Bool)
-{
-}

@@ -1,7 +1,0 @@
-
-.Struct = []
-.Array =
-{
-    .Struct
-    '' // <-- Mismatched type
-}

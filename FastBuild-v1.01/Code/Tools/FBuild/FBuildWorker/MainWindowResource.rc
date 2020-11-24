@@ -1,5 +1,0 @@
-#include "resource.h"
-
-// ICONS
-IDI_MAIN_ICON ICON          "..\\icons\\blue.ico"
-IDI_TRAY_ICON ICON          "..\\icons\\tray.ico"

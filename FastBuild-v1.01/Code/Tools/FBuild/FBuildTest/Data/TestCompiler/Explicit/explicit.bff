@@ -1,7 +1,0 @@
-//
-// Check the basic behaviour of an explicitly defined Compiler
-//
-Compiler( 'Compiler' )
-{
-    .Executable         = 'Tools/FBuild/FBuildTest/Data/TestCompiler/Explicit/PlaceholderForClang'
-}
